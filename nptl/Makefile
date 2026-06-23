@@ -72,6 +72,7 @@ routines = \
   pthread_attr_getstack \
   pthread_attr_getstackaddr \
   pthread_attr_getstacksize \
+  pthread_attr_getsysflags \
   pthread_attr_init \
   pthread_attr_setaffinity \
   pthread_attr_setdetachstate \
@@ -85,6 +86,7 @@ routines = \
   pthread_attr_setstack \
   pthread_attr_setstackaddr \
   pthread_attr_setstacksize \
+  pthread_attr_setsysflags \
   pthread_barrier_destroy \
   pthread_barrier_init \
   pthread_barrier_wait \

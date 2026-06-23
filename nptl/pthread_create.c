@@ -283,11 +283,13 @@ static int create_thread (struct pthread *pd, const struct pthread_attr *attr,
 			   | CLONE_CHILD_CLEARTID
 			   | 0);
 
+  const int effective_flags = attr->sysflags ? attr->sysflags : clone_flags;
+
   TLS_DEFINE_INIT_TP (tp, pd);
 
   struct clone_args args =
     {
-      .flags = clone_flags,
+      .flags = effective_flags,
       .pidfd = (uintptr_t) &pd->tid,
       .parent_tid = (uintptr_t) &pd->tid,
       .child_tid = (uintptr_t) &pd->joinstate,

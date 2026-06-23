@@ -382,6 +382,8 @@ libc {
     pthread_gettid_np;
   }
   GLIBC_2.43 {
+    pthread_attr_getsysflags;
+    pthread_attr_setsysflags;
   }
   GLIBC_PRIVATE {
     __libc_alloca_cutoff;

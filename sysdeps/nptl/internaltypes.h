@@ -40,7 +40,7 @@ struct pthread_attr
 
   /* Allocated via a call to __pthread_attr_extension once needed.  */
   struct pthread_attr_extension *extension;
-  void *unused;
+  size_t sysflags;
 };
 
 #define ATTR_FLAG_DETACHSTATE		0x0001
