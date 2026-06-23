@@ -1,0 +1,74 @@
+name: RISC-V Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install host dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            gcc-riscv64-linux-gnu \
+            binutils-riscv64-linux-gnu \
+            gawk \
+            bison \
+            make \
+            python3
+
+      - name: Install RISC-V kernel headers
+        run: |
+          KERNEL_VERSION="6.0"
+          mkdir -p build
+          wget -q "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-${KERNEL_VERSION}.tar.xz" -O build/linux-${KERNEL_VERSION}.tar.xz
+          tar -xf build/linux-${KERNEL_VERSION}.tar.xz -C build
+          make -C build/linux-${KERNEL_VERSION} ARCH=riscv INSTALL_HDR_PATH=${{ github.workspace }}/build/riscv-sysroot headers_install
+          rm -rf build/linux-${KERNEL_VERSION} build/linux-${KERNEL_VERSION}.tar.xz
+
+      - name: Configure glibc for RISC-V
+        run: |
+          mkdir -p build
+          cd build
+          ../configure \
+            --host=riscv64-linux-gnu \
+            --build=x86_64-linux-gnu \
+            CC=riscv64-linux-gnu-gcc \
+            CXX=riscv64-linux-gnu-g++ \
+            BUILD_CC=gcc \
+            CFLAGS="-O2" \
+            CXXFLAGS="-O2" \
+            --prefix=/usr \
+            --with-headers=${{ github.workspace }}/build/riscv-sysroot/include \
+            --disable-werror \
+
+      - name: Build glibc
+        run: |
+          cd build
+          make -j$(nproc)
+
+      - name: Install
+        run: |
+          cd build
+          make install DESTDIR=$(pwd)/staging
+          # Copy license and source reference into staging
+          cp ../COPYING.LESSERv2 staging/
+          echo "glibc 2.43, built from https://github.com/${{ github.repository }} @ ${{ github.sha }}" > staging/SOURCE
+
+      - name: Upload RISC-V artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: glibc-riscv64
+          path: |
+            build/staging/lib/ld-linux-riscv*.so*
+            build/staging/lib64/lp64d/libc.so*
+            build/staging/COPYING.LESSERv2
+            build/staging/SOURCE
