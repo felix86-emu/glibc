@@ -70,5 +70,6 @@ jobs:
           path: |
             build/staging/lib/ld-linux-riscv*.so*
             build/staging/lib64/lp64d/libc.so*
+            build/staging/lib64/lp64d/libm.so*
             build/staging/COPYING.LESSERv2
             build/staging/SOURCE
