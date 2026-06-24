@@ -59,17 +59,20 @@ jobs:
         run: |
           cd build
           make install DESTDIR=$(pwd)/staging
-          # Copy license and source reference into staging
           cp ../COPYING.LESSERv2 staging/
-          echo "glibc 2.43, built from https://github.com/${{ github.repository }} @ ${{ github.sha }}" > staging/SOURCE
+
+      - name: Repackage artifacts
+        run: |
+          mkdir -p build/package/lib/riscv64-linux-gnu
+          mkdir -p build/package/licenses
+
+          cp build/staging/lib/ld-linux-riscv*.so*  build/package/lib/riscv64-linux-gnu/
+          cp build/staging/lib64/lp64d/libc.so*     build/package/lib/riscv64-linux-gnu/
+          cp build/staging/lib64/lp64d/libm.so*     build/package/lib/riscv64-linux-gnu/
+          cp build/staging/COPYING.LESSERv2         build/package/licenses/
 
       - name: Upload RISC-V artifacts
         uses: actions/upload-artifact@v4
         with:
           name: glibc-riscv64
-          path: |
-            build/staging/lib/ld-linux-riscv*.so*
-            build/staging/lib64/lp64d/libc.so*
-            build/staging/lib64/lp64d/libm.so*
-            build/staging/COPYING.LESSERv2
-            build/staging/SOURCE
+          path: build/package/
