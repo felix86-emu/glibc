@@ -289,7 +289,8 @@ static int create_thread (struct pthread *pd, const struct pthread_attr *attr,
 
   struct clone_args args =
     {
-      .flags = effective_flags,
+      .flags = effective_flags & ~CSIGNAL,
+      .exit_signal = effective_flags & CSIGNAL,
       .pidfd = (uintptr_t) &pd->tid,
       .parent_tid = (uintptr_t) &pd->tid,
       .child_tid = (uintptr_t) &pd->joinstate,
