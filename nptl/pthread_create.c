@@ -624,7 +624,7 @@ out:
      The exit code is zero since in case all threads exit by calling
      'pthread_exit' the exit status must be 0 (zero).  */
   while (1)
-    INTERNAL_SYSCALL_CALL (exit, 0);
+    INTERNAL_SYSCALL_CALL (exit, (int) (intptr_t) pd->result);
 
   /* NOTREACHED */
 }
